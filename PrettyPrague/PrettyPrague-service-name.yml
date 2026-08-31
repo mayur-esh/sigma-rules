@@ -1,0 +1,27 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   PrettyPrague  - Avast/GenDigital EoP -> SAM/NTLM theft + pwd reset -> SYSTEM
+# =============================================================================
+title: PrettyPrague - Transient GUID-Named Service Installed
+id: e5af7631-83bf-4a40-a41b-40ec1be698e2
+status: experimental
+description: The PoC creates a service whose name is a freshly generated GUID. Detects service installs (7045) whose name matches a GUID pattern.
+references:
+  - https://github.com/MSNightmare/PrettyPrague
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.persistence
+  - attack.t1543.003
+logsource:
+  product: windows
+  service: system
+detection:
+  selection:
+    EventID: 7045
+    ServiceName|re: '^\{?[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}\}?$'
+  condition: selection
+falsepositives:
+  - Some legitimate software (e.g. certain installers/updaters) uses GUID service names - baseline first
+level: medium

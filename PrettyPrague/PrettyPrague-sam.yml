@@ -1,0 +1,29 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   PrettyPrague  - Avast/GenDigital EoP -> SAM/NTLM theft + pwd reset -> SYSTEM
+# =============================================================================
+title: SAM / Credential Theft - Raw Disk Volume Read
+id: b6a196d1-9401-43f2-a606-1fa23ee6bc14
+status: experimental
+description: Raw reads of a disk volume are a classic offline SAM/credential-store access primitive. Low volume, high signal outside backup/AV agents.
+references:
+  - https://github.com/MSNightmare/PrettyPrague
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.credential-access
+  - attack.t1003.002
+logsource:
+  category: raw_access_read
+  product: windows
+detection:
+  selection:
+    Device|contains: '\Device\HarddiskVolume'
+  filter_backup:
+    Image|endswith:
+      - '\wbengine.exe'
+      - '\vssvc.exe'
+  condition: selection and not filter_backup
+falsepositives:
+  - Backup software, disk imaging, some EDR/AV agents
+level: medium

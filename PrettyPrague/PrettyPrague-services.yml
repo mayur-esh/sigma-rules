@@ -1,0 +1,27 @@
+# =============================================================================
+# Sigma detection rules - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   PrettyPrague  - Avast/GenDigital EoP -> SAM/NTLM theft + pwd reset -> SYSTEM
+# =============================================================================
+title: PrettyPrague - SYSTEM Shell via Transient Service (services.exe spawns conhost.exe)
+id: c630cfeb-5743-42ee-bfd4-f14f3225101a
+status: experimental
+description: PrettyPrague installs a short-lived, GUID-named service that launches conhost.exe as SYSTEM, then deletes the service. Detects services.exe directly spawning conhost.exe.
+references:
+  - https://github.com/MSNightmare/PrettyPrague
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.t1543.003
+  - attack.t1134
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    ParentImage|endswith: '\services.exe'
+    Image|endswith: '\conhost.exe'
+  condition: selection
+falsepositives:
+  - Rare; conhost is normally a child of the console-hosting app, not services.exe
+level: high

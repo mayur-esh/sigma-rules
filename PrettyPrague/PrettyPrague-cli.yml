@@ -1,0 +1,25 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   PrettyPrague  - Avast/GenDigital EoP -> SAM/NTLM theft + pwd reset -> SYSTEM
+# =============================================================================
+title: PrettyPrague - Command Line IOC String
+id: e39bdbc4-83ae-4a76-bb97-9402d6eb9a00
+status: experimental
+description: The PoC embeds the constant PRETTY_PRAGUE (used as the temporary password). Any appearance on a command line is high-confidence.
+references:
+  - https://github.com/MSNightmare/PrettyPrague
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.t1078.003
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    CommandLine|contains: 'PRETTY_PRAGUE'
+  condition: selection
+falsepositives:
+  - Unlikely
+level: critical

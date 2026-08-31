@@ -1,0 +1,37 @@
+# =============================================================================
+# Sigma detection rules - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   PrettyPrague  - Avast/GenDigital EoP -> SAM/NTLM theft + pwd reset -> SYSTEM
+# =============================================================================
+title: PrettyPrague - samlib.dll Loaded by Unusual Process (SAM Password Manipulation)
+id: 9ff45951-08cf-4393-a7ce-9bc4be204fa3
+status: experimental
+description: SamiChangePasswordUser lives in samlib.dll. PrettyPrague loads it to reset a local admin password to a known value, log on, then restore it. Alerts when samlib.dll loads into a process that is not a normal SAM consumer.
+references:
+  - https://github.com/MSNightmare/PrettyPrague
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.credential-access
+  - attack.privilege-escalation
+  - attack.t1003.002
+logsource:
+  category: image_load
+  product: windows
+detection:
+  selection:
+    ImageLoaded|endswith: '\samlib.dll'
+  filter_legit:
+    Image|endswith:
+      - '\lsass.exe'
+      - '\services.exe'
+      - '\svchost.exe'
+      - '\mmc.exe'
+      - '\dsac.exe'
+      - '\SystemSettings.exe'
+      - '\explorer.exe'
+      - '\LogonUI.exe'
+      - '\wsmprovhost.exe'
+  condition: selection and not filter_legit
+falsepositives:
+  - Account-management MMC snap-ins or admin tooling not in the allowlist
+level: high

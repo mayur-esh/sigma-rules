@@ -1,0 +1,30 @@
+# =============================================================================
+# Sigma detection rules - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   PrettyPrague  - Avast/GenDigital EoP -> SAM/NTLM theft + pwd reset -> SYSTEM
+# =============================================================================
+title: PrettyPrague - Offline Registry API Loaded for SAM Hive Parsing
+id: c820e9a0-0931-49e4-ade2-f953b83834bb
+status: experimental
+description: Detects offreg.dll (offline registry hive API) loading into a process. Used by PrettyPrague to parse the SAM hive offline for NTLM extraction; rarely loaded by normal user processes.
+references:
+  - https://github.com/MSNightmare/PrettyPrague
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.credential-access
+  - attack.t1003.002
+logsource:
+  category: image_load
+  product: windows
+detection:
+  selection:
+    ImageLoaded|endswith: '\offreg.dll'
+  filter_known:
+    Image|endswith:
+      - '\dism.exe'
+      - '\DismHost.exe'
+      - '\TiWorker.exe'
+  condition: selection and not filter_known
+falsepositives:
+  - Servicing / imaging tools that legitimately manipulate offline hives
+level: high
