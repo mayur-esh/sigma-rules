@@ -1,0 +1,27 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+# =============================================================================
+title: Defense Tamper - WDigest Cleartext Credentials Re-Enabled
+id: d7453887-4b60-4f18-8419-db5638e87ffa
+status: experimental
+description: Detects UseLogonCredential being set to 1, which re-enables WDigest cleartext credential caching in LSASS - a common post-EoP credential-access enabler.
+references:
+  - https://learn.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.credential-access
+  - attack.defense-evasion
+  - attack.t1112
+  - attack.t1003.001
+logsource:
+  category: registry_set
+  product: windows
+detection:
+  selection:
+    TargetObject|endswith: '\WDigest\UseLogonCredential'
+    Details: 'DWORD (0x00000001)'
+  condition: selection
+falsepositives:
+  - Rare; almost always malicious on a hardened host
+level: high
