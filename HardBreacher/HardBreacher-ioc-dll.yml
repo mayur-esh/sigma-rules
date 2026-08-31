@@ -1,0 +1,25 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   HardBreacher  - Kaspersky Endpoint EoP -> arbitrary DLL write into System32
+# =============================================================================
+title: HardBreacher - MY_SNAKE_IS_SOLID.dll IOC (File or Load)
+id: bf69b548-89ef-48c3-9f40-688c1fa3af6a
+status: experimental
+description: The PoC's success artifact is C:\Windows\System32\MY_SNAKE_IS_SOLID.dll. Detects it being created or loaded.
+references:
+  - https://github.com/MSNightmare/HardBreacher
+author: Mayuresh Dani (defensive analysis)
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.t1574.001
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection:
+    TargetFilename|endswith: '\MY_SNAKE_IS_SOLID.dll'
+  condition: selection
+falsepositives:
+  - None
+level: critical

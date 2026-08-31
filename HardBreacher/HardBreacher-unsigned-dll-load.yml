@@ -1,0 +1,27 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   HardBreacher  - Kaspersky Endpoint EoP -> arbitrary DLL write into System32
+# =============================================================================
+title: HardBreacher - Unsigned DLL Loaded from System32
+id: 7d8a3965-8e01-44b6-98d6-3bd81404bb69
+status: experimental
+description: Detects an unsigned image loading from System32 - the execution stage of the HardBreacher DLL plant (a location where nearly all DLLs are Microsoft-signed).
+references:
+  - https://github.com/MSNightmare/HardBreacher
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.defense-evasion
+  - attack.t1574.002
+logsource:
+  category: image_load
+  product: windows
+detection:
+  selection:
+    ImageLoaded|startswith: 'C:\Windows\System32\'
+    Signed: 'false'
+  condition: selection
+falsepositives:
+  - A small number of legitimate unsigned/self-signed vendor DLLs
+level: high

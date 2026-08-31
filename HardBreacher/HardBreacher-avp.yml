@@ -1,0 +1,37 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   HardBreacher  - Kaspersky Endpoint EoP -> arbitrary DLL write into System32
+# =============================================================================
+title: HardBreacher - Handle Access / Injection into Kaspersky UI Process
+id: b0f02094-ff65-4193-95f1-f951b6f0ef4e
+status: experimental
+description: The exploit takes control of the Kaspersky UI process. Detects high-rights handle opens or remote-thread creation targeting avpui.exe / avp.exe.
+references:
+  - https://github.com/MSNightmare/HardBreacher
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.defense-evasion
+  - attack.t1055
+  - attack.t1562.001
+logsource:
+  category: process_access
+  product: windows
+detection:
+  selection:
+    TargetImage|endswith:
+      - '\avpui.exe'
+      - '\avp.exe'
+    GrantedAccess:
+      - '0x1F0FFF'
+      - '0x1F1FFF'
+      - '0x1FFFFF'
+      - '0x143A'
+      - '0x1438'
+      - '0x0820'
+      - '0x0800'
+  condition: selection
+falsepositives:
+  - Kaspersky's own components opening handles to sibling processes
+level: medium

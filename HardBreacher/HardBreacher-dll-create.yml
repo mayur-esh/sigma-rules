@@ -1,0 +1,40 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   HardBreacher  - Kaspersky Endpoint EoP -> arbitrary DLL write into System32
+# =============================================================================
+title: HardBreacher - DLL Written into System32 by Non-Servicing Process
+id: b5e82bca-604c-45ef-8e07-a8ea70b5ddd6
+status: experimental
+description: HardBreacher abuses Kaspersky's privileged file operation to drop a DLL into System32. Detects DLL creation under System32 by a process outside the known Windows-servicing set.
+references:
+  - https://github.com/MSNightmare/HardBreacher
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.defense-evasion
+  - attack.t1574.001
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection:
+    TargetFilename|startswith: 'C:\Windows\System32\'
+    TargetFilename|endswith: '.dll'
+  filter_servicing:
+    Image|endswith:
+      - '\TiWorker.exe'
+      - '\TrustedInstaller.exe'
+      - '\msiexec.exe'
+      - '\poqexec.exe'
+      - '\wuauclt.exe'
+      - '\CompatTelRunner.exe'
+      - '\svchost.exe'
+      - '\drvinst.exe'
+      - '\dism.exe'
+      - '\DismHost.exe'
+      - '\SppExtComObj.exe'
+  condition: selection and not filter_servicing
+falsepositives:
+  - Third-party installers and updaters that legitimately drop DLLs in System32
+level: high
