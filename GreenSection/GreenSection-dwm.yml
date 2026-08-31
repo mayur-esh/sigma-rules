@@ -1,0 +1,32 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   GreenSection  - NVIDIA shared-section OOB write (cross-user / dwm.exe)
+# =============================================================================
+title: GreenSection - Cross-Process Access into Desktop Compositor (dwm.exe)
+id: 20830517-de32-45b0-b0ef-351b234ab1ed
+status: experimental
+description: GreenSection can reach across user/process boundaries, including dwm.exe. Detects high-rights handle opens or remote threads targeting dwm.exe.
+references:
+  - https://github.com/MSNightmare/GreenSection
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.t1055
+logsource:
+  category: process_access
+  product: windows
+detection:
+  selection:
+    TargetImage|endswith: '\dwm.exe'
+    GrantedAccess:
+      - '0x1F0FFF'
+      - '0x1F1FFF'
+      - '0x143A'
+      - '0x1438'
+      - '0x0820'
+      - '0x0800'
+  condition: selection
+falsepositives:
+  - Some graphics/accessibility tooling opens dwm.exe
+level: medium

@@ -1,0 +1,28 @@
+# =============================================================================
+# Sigma detection rule - "Chaotic Eclipse" / MSNightmare 0day PoCs (Windows 11 25H2)
+#   GreenSection  - NVIDIA shared-section OOB write (cross-user / dwm.exe)
+# =============================================================================
+title: GreenSection - NVIDIA User-Mode Driver Crash (nvoglv64)
+id: 089ce3be-584f-4e3d-9aa2-381f8b619a0a
+status: experimental
+description: The OOB write faults in nvoglv64!DrvPresentBuffers. Detects Application Error (1000) events referencing nvoglv64.dll. Repeated crashes across processes/users may indicate GreenSection triggering. Field mapping for the faulting module varies by pipeline.
+references:
+  - https://github.com/MSNightmare/GreenSection
+author: Mayuresh Dani
+date: 2026-08-30
+tags:
+  - attack.privilege-escalation
+  - attack.impact
+logsource:
+  product: windows
+  service: application
+detection:
+  selection:
+    EventID: 1000
+    Source: 'Application Error'
+    Data|contains: 'nvoglv64'
+  condition: selection
+falsepositives:
+  - Genuine NVIDIA driver instability/unrelated GL/Vulkan app bugs
+  - Remap for your SIEM
+level: low
