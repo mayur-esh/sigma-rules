@@ -2,7 +2,7 @@
 My collection of Sigma rules
 
 # Includes:
-GreenSection 
-HardBreacher
-PrettyPrague
-Generic detection rules
+- GreenSection 
+- HardBreacher
+- PrettyPrague
+- Generic detection rules
