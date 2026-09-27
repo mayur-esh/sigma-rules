@@ -1,0 +1,19 @@
+title: Burst Of GUID-Named Temp File Creations
+id: 8e3f7b29-1c56-4a80-93de-5b02f41ea768
+status: experimental
+description: |
+    Ten or more GUID-named extensionless temp files created on one host in
+    five minutes. Reflects the re-invocation loop in disk exhaustion tooling
+    that spawns a fresh allocation attempt on every filesystem size change.
+author: Mayuresh Dani
+date: 2026-09-26
+correlation:
+    type: event_count
+    rules:
+        - c4e9d1a7-2b85-4f60-91ad-73c0e6b48f29
+    group-by:
+        - Computer
+    timespan: 5m
+    condition:
+        gte: 10
+level: high
