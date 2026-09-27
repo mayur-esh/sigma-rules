@@ -1,0 +1,26 @@
+title: Low Disk Space Warning From Server Service
+id: 5c81a24f-7e93-4b06-a1d8-36f0b9e5c714
+status: experimental
+description: |
+    Srv event 2013 fires when free space falls below DiskSpaceThreshold.
+    Useful as an early tripwire because it can be configured to fire while
+    there is still space left to write logs. See caveats in the post: this
+    event is reported as unreliable on client SKUs.
+references:
+    - https://learn.microsoft.com/en-us/answers/questions/3249913/event-id-2013-low-disk-space
+author: Mayuresh Dani
+date: 2026-09-26
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+logsource:
+    product: windows
+    service: system
+detection:
+    selection:
+        Provider_Name: 'Srv'
+        EventID: 2013
+    condition: selection
+falsepositives:
+    - Ordinary low disk space
+level: low
