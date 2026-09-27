@@ -1,0 +1,41 @@
+title: Microsoft Defender Update Failure Due To Insufficient Disk Space
+id: 9b217e04-5a63-4c8d-8f12-6de0349ab7c5
+status: experimental
+description: |
+    Defender update failure where the error code maps to ERROR_DISK_FULL
+    (Win32 112, HRESULT 0x80070070). Strong indicator of update starvation,
+    whether deliberate or from an ordinary full disk. Correlate with whether
+    free space recovered immediately after the failure, which distinguishes a
+    genuinely full disk from an attacker releasing the allocation.
+references:
+    - https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+author: Mayuresh Dani
+date: 2026-09-26
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+logsource:
+    product: windows
+    service: windefend
+detection:
+    selection:
+        EventID:
+            - 2001
+            - 2003
+            - 2006
+    disk_full_underscore:
+        Error_Code|contains:
+            - '0x80070070'
+            - '2147942512'
+    disk_full_spaced:
+        'Error Code|contains':
+            - '0x80070070'
+            - '2147942512'
+    disk_full_joined:
+        ErrorCode|contains:
+            - '0x80070070'
+            - '2147942512'
+    condition: selection and 1 of disk_full_*
+falsepositives:
+    - Genuinely full disks from ordinary causes
+level: high
