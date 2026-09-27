@@ -1,0 +1,30 @@
+title: GUID-Named Extensionless File Created In Temp Directory
+id: c4e9d1a7-2b85-4f60-91ad-73c0e6b48f29
+status: experimental
+description: |
+    Detects creation of a file in a temp directory whose entire name is a
+    braced GUID with no extension. Matches the naming scheme used by disk
+    space exhaustion tooling that allocates free space via NtCreateFile
+    AllocationSize without writing data.
+references:
+    - https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile
+author: Mayuresh Dani
+date: 2026-09-26
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+logsource:
+    product: windows
+    category: file_event
+detection:
+    selection:
+        TargetFilename|re: '(?i)\\Temp\\\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\}$'
+    filter_main_installers:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\TrustedInstaller.exe'
+            - '\TiWorker.exe'
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Installers and COM-heavy applications that use GUID scratch names
+level: medium
