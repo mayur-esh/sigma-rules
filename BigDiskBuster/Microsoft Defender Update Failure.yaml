@@ -1,0 +1,30 @@
+title: Microsoft Defender Update Failure
+id: 3f8a1c62-7d44-4e19-9b03-2ca5e8f71d40
+status: experimental
+description: |
+    Detects Defender security intelligence, engine, or platform update failures.
+    Update starvation via disk exhaustion surfaces here first. Benign causes are
+    common, so this is a hunting feed rather than a page-someone alert. Pair with
+    Rule 2 for the high-confidence variant.
+references:
+    - https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+author: Mayuresh Dani
+date: 2026-09-26
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+logsource:
+    product: windows
+    service: windefend
+detection:
+    selection:
+        EventID:
+            - 2001  # MALWAREPROTECTION_SIGNATURE_UPDATE_FAILED
+            - 2003  # MALWAREPROTECTION_ENGINE_UPDATE_FAILED
+            - 2006  # MALWAREPROTECTION_PLATFORM_UPDATE_FAILED
+    condition: selection
+falsepositives:
+    - Network outages and proxy failures
+    - WSUS or update-source misconfiguration
+    - Machines offline for extended periods
+level: low
