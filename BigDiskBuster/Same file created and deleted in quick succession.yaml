@@ -1,0 +1,24 @@
+title: GUID-Named Temp File Deleted Shortly After Creation
+id: 7a0c5f38-9e41-4d72-b6c8-1f4e02a95bd3
+status: experimental
+description: |
+    Companion to the file-create rule. FILE_DELETE_ON_CLOSE means the
+    allocation file disappears when the handle closes, so create and delete
+    events pair up with no write activity between them.
+references:
+    - https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+author: Mayuresh Dani
+date: 2026-09-26
+tags:
+    - attack.defense-evasion
+    - attack.t1562.001
+logsource:
+    product: windows
+    category: file_delete
+detection:
+    selection:
+        TargetFilename|re: '(?i)\\Temp\\\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\}$'
+    condition: selection
+falsepositives:
+    - Installer cleanup
+level: medium
