@@ -1,0 +1,18 @@
+title: Defender Update Failure Following GUID-Named Temp File Activity
+id: 2d6b8e15-4f03-49ca-85d7-9e1a37c0b462
+status: experimental
+description: |
+    Temporal correlation of GUID-named temp file creation with a Defender
+    update failure on the same host inside 15 minutes. This pairing is the
+    behavioral signature of update starvation via disk exhaustion.
+author: Mayuresh Dani
+date: 2026-09-26
+correlation:
+    type: temporal
+    rules:
+        - c4e9d1a7-2b85-4f60-91ad-73c0e6b48f29
+        - 3f8a1c62-7d44-4e19-9b03-2ca5e8f71d40
+    group-by:
+        - Computer
+    timespan: 15m
+level: high
