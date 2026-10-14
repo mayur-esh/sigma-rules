@@ -1,6 +1,6 @@
 # Patch Tuesday, October 2026: Sigma rules
 
-Companion to the PenTestIT October 2026 Patch Tuesday post. Status: experimental. The Sysmon telemetry these rules expect is in [mayur-esh/sysmon](https://github.com/mayur-esh/sysmon/blob/main/PatchTuesday-2026-10.xml).
+Companion to the PenTestIT October 2026 Patch Tuesday post - https://pentestit.com/microsoft-patch-tuesday-october-2026-exploitability-and-patching-priority/ Status: experimental. The Sysmon telemetry these rules expect is in [mayur-esh/sysmon](https://github.com/mayur-esh/sysmon/blob/main/PatchTuesday-2026-10.xml). 
 
 ## New rules
 
@@ -27,15 +27,6 @@ Companion to the PenTestIT October 2026 Patch Tuesday post. Status: experimental
 | [LSASS Process Crashed - Application](https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/application/application_error/win_application_error_lsass_crash.yml) | a18e0862 | matches exception c0000001 only |
 | [HardBreacher - Unsigned DLL Loaded from System32](../HardBreacher/HardBreacher-unsigned-dll-load.yml) | 7d8a3965 | this repo; complements the CVE-2026-108398 rule (System32 instead of user paths) |
 | [BITS Transfer Job Download From Direct IP](https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/bits_client/win_bits_client_new_transfer_via_ip_address.yml) | 90f138c1 | post-exploitation staging |
-
-## Validation
-
-```
-pip install -r tools/requirements.txt
-python3 tools/validate_detections.py --sysmon ../sysmon/PatchTuesday-2026-10.xml \
-  --sigma PatchTuesday-2026-10 --events PatchTuesday-2026-10/tests/events.yml \
-  [--reused <dir of the SigmaHQ rules above>] [--attack enterprise-attack.json]
-```
 
 Checks: Sysmon field and condition vocabulary, Sysmon include logic simulated against 62 synthetic events (positive and negative), pySigma validators, conversion to Splunk and KQL, and every Sigma rule (and the ADCS correlation) executed in SQLite against the same events.
 
