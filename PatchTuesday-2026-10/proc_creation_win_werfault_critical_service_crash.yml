@@ -1,0 +1,46 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, October 2026
+# =============================================================================
+title: WerFault Spawned By A Network-Facing Or Credential Service
+id: ec397f30-d24b-449f-b55e-89fd42737d84
+status: experimental
+description: |
+    Detects Windows Error Reporting launched by a process whose crash is a plausible sign of
+    exploitation of the October 2026 memory-safety RCEs (Outlook Reading Pane, LSASS, DNS Server,
+    MSMQ, PostScript, Exchange, Hyper-V worker, OpenSSH). A single crash is weak evidence; clusters
+    across hosts, or a crash followed by a new child process, are strong.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-70242
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-96219
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-83869
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-100202
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-97816
+author: Mayuresh Dani
+date: 2026-10-13
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - attack.lateral-movement
+    - attack.t1210
+    - attack.execution
+    - attack.t1203
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\WerFault.exe'
+        ParentImage|endswith:
+            - '\OUTLOOK.EXE'
+            - '\lsass.exe'
+            - '\dns.exe'
+            - '\mqsvc.exe'
+            - '\spoolsv.exe'
+            - '\PrintIsolationHost.exe'
+            - '\EdgeTransport.exe'
+            - '\vmwp.exe'
+            - '\sshd.exe'
+    condition: selection
+falsepositives:
+    - Genuine application crashes, especially Outlook add-in faults
+level: low

@@ -1,0 +1,39 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, October 2026
+# =============================================================================
+title: Script File Written To Exchange Web Directory
+id: e65831e5-fdde-41b4-a845-6fcd39280d39
+related:
+    - id: bd1212e5-78da-431e-95fa-c58e3237a8e6
+      type: similar
+status: experimental
+description: |
+    Detects an .aspx, .ashx or .asmx file written into Exchange or IIS web directories, the usual
+    webshell drop after Exchange RCE such as CVE-2026-70571. Unlike the SigmaHQ rule bd1212e5, it does
+    not need CommandLine on file events, so it works with plain Sysmon Event ID 11.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-70571
+author: Mayuresh Dani
+date: 2026-10-13
+tags:
+    - attack.persistence
+    - attack.t1505.003
+    - cve.2026-70571
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_path:
+        TargetFilename|contains:
+            - '\FrontEnd\HttpProxy\'
+            - '\ClientAccess\'
+            - '\inetpub\wwwroot\aspnet_client\'
+    selection_ext:
+        TargetFilename|endswith:
+            - '.aspx'
+            - '.ashx'
+            - '.asmx'
+    condition: all of selection_*
+falsepositives:
+    - Exchange cumulative updates and IIS application deployments
+level: high

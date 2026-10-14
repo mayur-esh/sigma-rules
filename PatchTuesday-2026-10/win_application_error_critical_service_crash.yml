@@ -1,0 +1,46 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, October 2026
+# =============================================================================
+title: Application Crash Of A Service Patched In October 2026
+id: e887d5d2-86b5-4840-81ad-a8b02cb8f671
+related:
+    - id: a18e0862-127b-43ca-be12-1a542c75c7c5
+      type: similar
+status: experimental
+description: |
+    Detects Application Error 1000 for processes hit by October 2026 memory-safety RCEs, for any
+    exception code. The SigmaHQ LSASS crash rule matches only STATUS_UNSUCCESSFUL (Lsass-Shtinkering),
+    so it misses access-violation crashes typical of exploitation attempts.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-96219
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-83869
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-96113
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-70242
+author: Mayuresh Dani
+date: 2026-10-13
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - attack.lateral-movement
+    - attack.t1210
+logsource:
+    product: windows
+    service: application
+detection:
+    selection:
+        Provider_Name: 'Application Error'
+        EventID: 1000
+        AppName:
+            - 'OUTLOOK.EXE'
+            - 'lsass.exe'
+            - 'dns.exe'
+            - 'mqsvc.exe'
+            - 'spoolsv.exe'
+            - 'PrintIsolationHost.exe'
+            - 'EdgeTransport.exe'
+            - 'vmwp.exe'
+            - 'sshd.exe'
+    condition: selection
+falsepositives:
+    - Genuine application crashes; correlate across hosts and with child-process activity
+level: medium

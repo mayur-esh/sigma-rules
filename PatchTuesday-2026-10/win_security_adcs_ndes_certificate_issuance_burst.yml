@@ -1,0 +1,49 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, October 2026
+# =============================================================================
+title: ADCS Certificate Issuance Burst From A Single Requester
+id: e98b5499-eeee-43f4-ad24-374961dabc92
+name: adcs_certificate_issued
+status: experimental
+description: |
+    Base rule: certificate issued by an ADCS CA (Security 4887). Used by the correlation below to find
+    a burst from one requester, which is how abuse of an NDES or enrollment endpoint (for example after
+    CVE-2026-69802, NDES RCE) shows up on the CA.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-69802
+author: Mayuresh Dani
+date: 2026-10-13
+tags:
+    - attack.credential-access
+    - attack.t1649
+    - cve.2026-69802
+logsource:
+    product: windows
+    service: security
+    definition: 'Requires CA\AuditFilter bit 0x04 and auditpol "Certification Services" success auditing on the CA.'
+detection:
+    selection:
+        EventID: 4887
+    condition: selection
+falsepositives:
+    - Mass enrollment after a template change or device rollout
+level: informational
+---
+title: ADCS Certificate Issuance Burst From A Single Requester (Correlation)
+id: bfa9cbbc-e5c8-40dd-96cf-f12b6438c1b3
+status: experimental
+description: More than 20 certificates issued to one requester within 10 minutes.
+author: Mayuresh Dani
+date: 2026-10-13
+correlation:
+    type: event_count
+    rules:
+        - adcs_certificate_issued
+    group-by:
+        - Requester
+    timespan: 10m
+    condition:
+        gte: 20
+falsepositives:
+    - Mass enrollment after a template change or device rollout
+level: medium

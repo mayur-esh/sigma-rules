@@ -1,0 +1,49 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, October 2026
+# =============================================================================
+title: Script Host Launched By Explorer From Download Or Attachment Path
+id: 6f6f2ebc-76e8-43d4-b7a1-cf98632e9e3b
+status: experimental
+description: |
+    Detects Explorer launching a script host or LOLBin on a file that sits in a browser download,
+    Outlook attachment or temp extraction path. This is the execution step that a Mark of the Web
+    bypass such as CVE-2026-96951 (Windows Shell, exploited, CISA KEV) removes the warning for.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-96951
+    - https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+author: Mayuresh Dani
+date: 2026-10-13
+tags:
+    - attack.defense-impairment
+    - attack.t1553.005
+    - attack.execution
+    - attack.t1204.002
+    - cve.2026-96951
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith: '\explorer.exe'
+    selection_img:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\mshta.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\msiexec.exe'
+            - '\hh.exe'
+    selection_path:
+        CommandLine|contains:
+            - '\Downloads\'
+            - '\Content.Outlook\'
+            - '\INetCache\'
+            - '\AppData\Local\Temp\'
+    condition: all of selection_*
+falsepositives:
+    - Users running installers or scripts they downloaded on purpose
+level: medium

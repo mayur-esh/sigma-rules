@@ -1,0 +1,35 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, October 2026
+# =============================================================================
+title: Unsigned DLL From User-Writable Path Loaded By Windows Binary
+id: 3718025b-cab5-44e1-b076-e9b452cd0020
+status: experimental
+description: |
+    Hunts for the outcome of a WDAC bypass such as CVE-2026-108398 (.NET Framework, publicly
+    disclosed): a binary under C:\Windows loading an unsigned module from a user-writable path.
+    WDAC normally prevents this, so on WDAC-enforced hosts any hit deserves a look.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-108398
+author: Mayuresh Dani
+date: 2026-10-13
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+    - attack.stealth
+    - attack.t1574.001
+    - cve.2026-108398
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection:
+        Image|startswith: 'C:\Windows\'
+        ImageLoaded|contains:
+            - '\Users\'
+            - '\ProgramData\'
+            - '\Windows\Temp\'
+        Signed: 'false'
+    condition: selection
+falsepositives:
+    - Unsigned plugins loaded by Windows hosts (rundll32, mmc) on hosts without WDAC
+level: low
