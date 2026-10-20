@@ -1,0 +1,29 @@
+title: Electron app.asar Written by a Non-Updater Process
+id: 0e06608d-a7e9-4f53-9eaf-12cc184eb271
+status: experimental
+description: Detects creation or overwrite of an Electron app.asar file by a process other than a known installer or updater. Apps without the OnlyLoadAppFromAsar and EmbeddedAsarIntegrityValidation fuses run a tampered app.asar on next launch.
+references:
+    - https://attack.mitre.org/techniques/T1218/015/
+    - https://www.electronjs.org/docs/latest/tutorial/fuses
+author: Mayuresh Dani
+date: 2026-10-18
+tags:
+    - attack.persistence
+    - attack.defense-evasion
+    - attack.t1218.015
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection:
+        TargetFilename|endswith: '\resources\app.asar'
+    filter_main_updaters:
+        Image|endswith:
+            - '\Update.exe'
+            - '\Squirrel.exe'
+            - '\msiexec.exe'
+            - '\CodeSetup-stable.exe'
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Installers and updaters not in the filter list; baseline per app before enabling
+level: high
