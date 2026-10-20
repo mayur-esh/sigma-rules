@@ -1,0 +1,43 @@
+title: Electron Application Launched With a Script Argument
+id: 0b0d99af-4952-4675-96c4-7b86c189d910
+related:
+    - id: 378a05d8-963c-46c9-bcce-13c7657eac99
+      type: similar
+status: experimental
+description: Detects an Electron application started with a .js/.mjs/.cjs file as an argument, the command line shape of ELECTRON_RUN_AS_NODE proxy execution. Windows process telemetry does not record environment variables, so this matches on the script argument instead. Scope the image list to apps your fuse audit marked as RunAsNode enabled.
+references:
+    - https://attack.mitre.org/techniques/T1218/015/
+    - https://www.electronjs.org/docs/latest/tutorial/fuses
+author: Mayuresh Dani
+date: 2026-10-18
+tags:
+    - attack.defense-evasion
+    - attack.t1218.015
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        Image|endswith:
+            - '\Code.exe'
+            - '\Cursor.exe'
+            - '\Discord.exe'
+            - '\Obsidian.exe'
+            - '\Postman.exe'
+            - '\slack.exe'
+            - '\GitHubDesktop.exe'
+    selection_script:
+        CommandLine|re: '(?i)\.(c|m)?js["'']?(\s|$)'
+    filter_main_vscode_cli:
+        CommandLine|contains|all:
+            - '\AppData\Local\Programs\Microsoft VS Code\'
+            - '\resources\app\out\cli.js'
+    filter_main_cursor_cli:
+        CommandLine|contains: '\AppData\Local\Programs\cursor\resources\app\bin\..\out\cli.js'
+    filter_main_child:
+        CommandLine|contains: '--type='
+    condition: all of selection_* and not 1 of filter_main_*
+falsepositives:
+    - Developers running Node scripts through an Electron app on purpose
+    - Other editor command-line shims that use RunAsNode by design; add them as filters after baselining
+level: medium
