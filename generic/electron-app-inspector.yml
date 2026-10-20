@@ -1,0 +1,36 @@
+title: Electron Application Started With Inspector or Remote Debugging Enabled
+id: 32fb707f-5485-4d9a-9a9f-002963b12e0f
+status: experimental
+description: Detects an Electron application started with Node inspector or Chromium remote debugging flags. Any process that reaches the port can run code inside the trusted app. Works only where the EnableNodeCliInspectArguments fuse is left enabled for --inspect variants.
+references:
+    - https://attack.mitre.org/techniques/T1218/015/
+    - https://www.electronjs.org/docs/latest/tutorial/fuses
+author: Mayuresh Dani
+date: 2026-10-18
+tags:
+    - attack.defense-evasion
+    - attack.t1218.015
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        Image|endswith:
+            - '\Code.exe'
+            - '\Cursor.exe'
+            - '\Discord.exe'
+            - '\Obsidian.exe'
+            - '\Postman.exe'
+            - '\slack.exe'
+            - '\GitHubDesktop.exe'
+    selection_flags:
+        CommandLine|contains:
+            - '--inspect'
+            - '--remote-debugging-port'
+            - '--remote-debugging-pipe'
+    filter_main_child_renderer:
+        CommandLine|contains: '--type='
+    condition: all of selection_* and not 1 of filter_main_*
+falsepositives:
+    - Developers debugging Electron apps or extensions
+level: high
