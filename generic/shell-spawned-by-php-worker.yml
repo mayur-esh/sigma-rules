@@ -1,0 +1,47 @@
+title: Shell or Network Tool Spawned by PHP Worker
+id: 77935bfc-5cad-47c2-9542-93af2f999129
+related:
+  - id: 818f7b24-0fba-4c49-a073-8b755573b9c7
+    type: similar
+status: experimental
+description: Post-exploitation hunt for PHP RCE, including CVE-2026-109618 and CVE-2026-109619
+references:
+  - https://www.php.net/archive/2026.php#2026-10-20-1
+author: Mayuresh Dani
+date: 2026-10-20
+tags:
+  - attack.execution
+  - attack.t1059.004
+  - attack.persistence
+  - attack.t1505.003
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  parent:
+    ParentImage|contains:
+      - '/php-fpm'
+      - '/php-cgi'
+      - '/frankenphp'
+      - '/apache2'
+      - '/httpd'
+  child:
+    Image|endswith:
+      - '/sh'
+      - '/bash'
+      - '/dash'
+      - '/curl'
+      - '/wget'
+      - '/nc'
+      - '/ncat'
+      - '/python3'
+      - '/perl'
+      - '/base64'
+  filter_mail:
+    # PHP mail() runs sendmail through /bin/sh -c
+    Image|endswith: '/sh'
+    CommandLine|contains: '/usr/sbin/sendmail'
+  condition: parent and child and not filter_mail
+falsepositives:
+  - Apps that call exec() or proc_open() on purpose (image tools, Composer)
+level: high
