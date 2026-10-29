@@ -1,0 +1,70 @@
+title: Node.js Server Process Spawning Shell, Downloader or Recon Tool
+id: 3c9a51e2-7d44-4f0b-b1f6-0a6f2e111497
+status: experimental
+description: |
+    Detects a long-running Node.js server spawning a shell, downloader, interpreter or recon binary.
+    Generic post-exploitation coverage for memory-corruption RCE in the Node.js runtime, such as CVE-2026-111497 (Node2Shell/HTTP2Shell),
+    where no request-level exploit signature is public. Not specific to any one CVE.
+references:
+    - https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
+    - https://nodejs.org/api/child_process.html
+author: Mayuresh Dani
+date: 2026-10-27
+tags:
+    - attack.execution
+    - attack.t1059
+    - attack.initial-access
+    - attack.t1190
+    - cve.2026-111497
+logsource:
+    category: process_creation
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '/node'
+            - '\node.exe'
+    selection_child_img:
+        Image|endswith:
+            - '/sh'
+            - '/bash'
+            - '/dash'
+            - '/zsh'
+            - '/busybox'
+            - '/curl'
+            - '/wget'
+            - '/nc'
+            - '/ncat'
+            - '/socat'
+            - '/python3'
+            - '/perl'
+            - '/id'
+            - '/whoami'
+            - '/uname'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\whoami.exe'
+            - '\certutil.exe'
+            - '\curl.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+    filter_main_package_managers:
+        ParentCommandLine|contains:
+            - 'npm-cli.js'
+            - '/npm '
+            - '\npm '
+            - 'yarn'
+            - 'pnpm'
+            - 'node-gyp'
+            - 'npx-cli.js'
+            - 'corepack'
+    filter_main_install_scripts:
+        CommandLine|contains:
+            - 'node-gyp'
+            - 'prebuild-install'
+            - 'node-pre-gyp'
+    condition: selection_parent and selection_child_img and not 1 of filter_main_*
+falsepositives:
+    - Applications that legitimately shell out (git, image tools, PDF renderers); baseline per service and add filters
+    - Dev servers and test runners on developer machines
+level: medium
