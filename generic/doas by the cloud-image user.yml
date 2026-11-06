@@ -1,0 +1,23 @@
+title: doas Root Execution By Alpine Cloud Image User
+id: 5b8f0c23-4e1d-4a7b-8c2f-7d8e9f0a1b24
+status: experimental
+description: |
+  The tiny-cloud alpine user (shadow field "*") has passwordless doas. Any doas use by it on a
+  host where it should only log in with keys is worth correlating with sshd Accepted password events.
+references:
+  - https://alpinelinux.org/posts/2026-11-05-openssh-password-authentication-bypass/
+author: Mayuresh Dani
+date: 2026-11-06
+tags:
+  - attack.privilege-escalation
+  - attack.t1548.003
+logsource:
+  product: linux
+  service: auth
+detection:
+  keywords:
+    - 'doas: alpine ran command'
+  condition: keywords
+falsepositives:
+  - Legitimate administration through the alpine user
+level: high
