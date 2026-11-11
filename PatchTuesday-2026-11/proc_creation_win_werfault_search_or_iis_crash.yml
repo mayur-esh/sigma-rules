@@ -1,0 +1,37 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, November 2026
+# =============================================================================
+title: Windows Search Or IIS Worker Crash
+id: 94b324a2-b76f-4ef9-aa51-95d3a791cf24
+status: experimental
+description: |
+    Detects Windows Error Reporting started by a Windows Search process or an IIS worker process. A crash
+    is the usual trace of a failed or unstable memory-corruption attempt against CVE-2026-116928 (Windows
+    Search RCE, out-of-bounds write) or CVE-2026-119961 (IIS RCE). The October rule
+    proc_creation_win_werfault_critical_service_crash.yml already covers LSASS, Message Queuing and the
+    Print Spooler.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-116928
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-119961
+author: Mayuresh Dani
+date: 2026-11-10
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - cve.2026-116928
+    - cve.2026-119961
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\WerFault.exe'
+        ParentImage|endswith:
+            - '\SearchIndexer.exe'
+            - '\SearchProtocolHost.exe'
+            - '\SearchFilterHost.exe'
+            - '\w3wp.exe'
+    condition: selection
+falsepositives:
+    - Faulty IFilters or web applications that crash routinely (baseline first)
+level: medium

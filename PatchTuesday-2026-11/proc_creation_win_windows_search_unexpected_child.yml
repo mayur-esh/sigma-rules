@@ -1,0 +1,45 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, November 2026
+# =============================================================================
+title: Windows Search Process Spawns An Unexpected Child Process
+id: 5cfd178a-b14f-4703-ba34-786eb08d1083
+status: experimental
+description: |
+    Detects SearchIndexer.exe, SearchProtocolHost.exe or SearchFilterHost.exe starting anything other than
+    the Search hosts themselves, Windows Error Reporting or a console host. MSRC says an unauthenticated
+    attacker can exploit CVE-2026-116928 (Windows Search RCE, CVSS 9.8) by mailing an attachment that
+    Exchange indexes automatically, so no one has to open it. Code running in the indexer's context is the
+    outcome to look for on Exchange servers first.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-116928
+author: Mayuresh Dani
+date: 2026-11-10
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - attack.execution
+    - attack.t1203
+    - cve.2026-116928
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith:
+            - '\SearchIndexer.exe'
+            - '\SearchProtocolHost.exe'
+            - '\SearchFilterHost.exe'
+    filter_main_search_hosts:
+        Image|endswith:
+            - '\SearchProtocolHost.exe'
+            - '\SearchFilterHost.exe'
+    filter_main_wer:
+        Image|endswith:
+            - '\WerFault.exe'
+            - '\WerFaultSecure.exe'
+    filter_main_conhost:
+        Image|endswith: '\conhost.exe'
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Third-party protocol handlers or IFilters that start helper processes (baseline per server)
+level: high

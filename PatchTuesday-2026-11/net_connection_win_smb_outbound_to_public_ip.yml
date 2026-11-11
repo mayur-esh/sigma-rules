@@ -1,0 +1,48 @@
+# =============================================================================
+# Sigma detection rule - Microsoft Patch Tuesday, November 2026
+# =============================================================================
+title: Outbound SMB Connection To A Public IP Address
+id: 9420ef40-06e4-49cd-aa9c-7d60ac819132
+status: experimental
+description: |
+    Detects the Windows SMB client (logged by Sysmon as the System process) or classic Outlook opening
+    TCP 445 or 139 to an address outside the private ranges. That is the network outcome of forced
+    authentication: the host sends the user's NTLMv2 response to whoever runs the server. MSRC rates
+    CVE-2026-124194 (Outlook spoofing, NTLMv2 hash disclosure) Exploitation Detected. Most perimeters block
+    outbound SMB, so also alert on the firewall deny for the same flow.
+references:
+    - https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-124194
+author: Mayuresh Dani
+date: 2026-11-10
+tags:
+    - attack.credential-access
+    - attack.t1187
+    - cve.2026-124194
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_img_kernel:
+        Image: 'System'
+    selection_img_outlook:
+        Image|endswith: '\OUTLOOK.EXE'
+    selection_smb:
+        DestinationPort:
+            - 445
+            - 139
+        Initiated: 'true'
+    filter_main_private:
+        DestinationIp|cidr:
+            - '127.0.0.0/8'
+            - '10.0.0.0/8'
+            - '172.16.0.0/12'
+            - '192.168.0.0/16'
+            - '169.254.0.0/16'
+            - '100.64.0.0/10'
+            - '::1/128'
+            - 'fe80::/10'
+            - 'fc00::/7'
+    condition: 1 of selection_img_* and selection_smb and not 1 of filter_main_*
+falsepositives:
+    - File shares or Azure Files reached over the internet by design (add their ranges as a filter)
+level: high
