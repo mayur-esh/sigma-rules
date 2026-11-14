@@ -1,0 +1,30 @@
+title: norma Agent Library Web Fetch User-Agent (ARTEX Family) in Web Server Logs
+id: ed350d64-b4b8-45ad-bcb1-79d14a26fd1e
+status: experimental
+description: |
+    Detects requests carrying the user-agent set by the web fetch tool of the norma agent library
+    (tool/webfetch.go sets "norma/0.4" on the request and on its retry). ARTEX depends on norma
+    v0.4.3 and enables web fetch in its chat agent; the BaaRai, Pojun, ScopeWeaver and
+    ijlalhaider313 ARTEX forks keep it in their norma copies (v0.4.4, v0.4.6 and vendored v0.4.3).
+    Wiz reported norma/0.4 in Storm-0940 activity. norma describes itself as a general-purpose
+    agent harness SDK, so any agent built on it can match; ARTEX and its copies, including the
+    renamed AntiFox, are the known users.
+references:
+    - https://www.wiz.io/blog/artex-in-the-wild-storm-0940-expands-targeting-of-it-and-software-vendors
+    - https://pentestit.com/
+author: Mayuresh Dani
+date: 2026-11-09
+modified: 2026-11-14
+tags:
+    - attack.reconnaissance
+    - attack.t1595
+    - attack.t1595.002
+logsource:
+    category: webserver
+detection:
+    selection:
+        cs-user-agent|startswith: 'norma/0.'
+    condition: selection
+falsepositives:
+    - Other programs built on the norma agent library that keep its web fetch tool unchanged
+level: medium

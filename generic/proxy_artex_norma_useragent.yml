@@ -1,0 +1,27 @@
+title: norma Agent Library Web Fetch User-Agent (ARTEX Family) in Proxy Logs
+id: 52602419-99e8-44a2-b46c-84502747cc03
+status: experimental
+description: |
+    Detects outbound requests carrying the user-agent set by the web fetch tool of the norma agent
+    library ("norma/0.4"). A hit from an internal host means a program built on norma, such as
+    ARTEX or one of its forks, is running inside the network. norma describes itself as a
+    general-purpose agent harness SDK; ARTEX and its copies, including the renamed AntiFox,
+    are the known users.
+references:
+    - https://www.wiz.io/blog/artex-in-the-wild-storm-0940-expands-targeting-of-it-and-software-vendors
+    - https://pentestit.com/
+author: Mayuresh Dani
+date: 2026-11-09
+modified: 2026-11-14
+tags:
+    - attack.command-and-control
+    - attack.t1071.001
+logsource:
+    category: proxy
+detection:
+    selection:
+        c-useragent|startswith: 'norma/0.'
+    condition: selection
+falsepositives:
+    - Authorized red team or research use of ARTEX or another norma-based agent
+level: high
